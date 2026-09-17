@@ -112,8 +112,6 @@ Emails (spam folder + inbox)
 
 ML systems replace brittle, manually-maintained rules with patterns **learned from labeled data (features → target)**, and produce **probabilities** rather than hard rules — which is why a **threshold** is needed to turn a prediction into a decision.
 
-📝 Community notes: [Notes from Peter Ernicke](https://knowmledge.com/2023/09/10/ml-zoomcamp-2023-introduction-to-machine-learning-part-2/)
-
 ---
 
 <!-- Next lesson notes (1.3 Supervised Machine Learning) go below -->
