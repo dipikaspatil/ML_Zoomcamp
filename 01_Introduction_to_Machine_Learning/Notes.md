@@ -115,3 +115,48 @@ ML systems replace brittle, manually-maintained rules with patterns **learned fr
 ---
 
 <!-- Next lesson notes (1.3 Supervised Machine Learning) go below -->
+
+---
+
+## 1.3 Supervised Machine Learning
+
+📺 [Video](https://www.youtube.com/watch?v=j9kcEuGcC2Y&list=PL3MmuxUbc_hIhxl5Ji8t4O6lPAOpHaCLR&index=4) | 🖼️ [Slides](https://www.slideshare.net/AlexeyGrigorev/ml-zoomcamp-13-supervised-machine-learning)
+
+### Core idea
+
+In **Supervised Machine Learning (SML)**, every training example has **labels** (known targets) attached to its features. The model learns from these labeled examples and then predicts labels for new, unseen features.
+
+- **Feature matrix (X)** — a table of observations/objects (rows) × features (columns).
+- **Target variable (y)** — a vector holding the known target value for each row in `X`.
+- The model is represented as a function **g** that takes `X` as input and tries to output predictions as close as possible to `y`.
+- **Training** = the process of finding that function **g**.
+
+```
+        Feature matrix X                Target y
+   ┌───────────────────────┐          ┌─────────┐
+   │ year | mileage | make │          │  price  │
+   │ 2015 |  60,000 |Toyota│   --->   │ 12,000  │
+   │ 2018 |  30,000 | Honda│   --->   │ 16,500  │
+   │ 2020 |  10,000 |  Ford│   --->   │ 21,000  │
+   └───────────────────────┘          └─────────┘
+
+              g(X) ≈ y   ← training finds this function g
+```
+
+### Types of SML problems
+
+| Type              | Output                                   | Example                              |
+|-------------------|-------------------------------------------|----------------------------------------|
+| **Regression**     | A number                                  | Predicting a car's price               |
+| **Classification** | A category                                | Spam detection                         |
+| — Binary           | 2 categories                              | Spam vs. not spam                      |
+| — Multiclass       | More than 2 categories                    | Classifying animal species             |
+| **Ranking**        | Top scores associated with items          | Recommender systems (e.g. product/search ranking) |
+
+### Key takeaway
+
+SML is about teaching a model with labeled examples (features → known targets) so it can learn a function **g** that generalizes well — producing predictions on new data that are as close as possible to the true, unseen targets **y**.
+
+---
+
+<!-- Next lesson notes (1.4 CRISP-DM) go below -->
