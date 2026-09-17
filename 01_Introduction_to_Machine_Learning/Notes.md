@@ -6,8 +6,6 @@
 
 📺 [Video](https://www.youtube.com/watch?v=Crm_5n4mvmg&list=PL3MmuxUbc_hIhxl5Ji8t4O6lPAOpHaCLR&index=2) | 🖼️ [Slides](https://www.slideshare.net/AlexeyGrigorev/ml-zoomcamp-11-introduction-to-machine-learning)
 
-![Introduction to ML](https://github.com/DataTalksClub/machine-learning-zoomcamp/raw/main/01-intro/images/thumbnail-1-01.jpg)
-
 ### Core idea
 
 The lesson explains ML using a **car price prediction** example.
@@ -51,3 +49,71 @@ Machine Learning isn't about hard-coding rules — it's about letting a model **
 
 <!-- Next lesson notes (1.2 ML vs Rule-Based Systems) go below -->
 
+---
+
+## 1.2 ML vs Rule-Based Systems
+
+📺 [Video](https://www.youtube.com/watch?v=CeukwyUdaz8&list=PL3MmuxUbc_hIhxl5Ji8t4O6lPAOpHaCLR&index=3) | 🖼️ [Slides](https://www.slideshare.net/AlexeyGrigorev/ml-zoomcamp-12-ml-vs-rulebased-systems)
+
+### Core idea
+
+Explained using a **spam filter** example.
+
+- **Rule-based systems** flag spam using a fixed set of hand-written characteristics/keywords (e.g. "contains 'lottery'", "sender unknown", email length, etc.).
+- Problem: spam patterns keep **changing over time**, so rules need constant updates → the codebase grows, becomes messy, and hard to maintain.
+- **ML systems** solve this by learning the patterns from data instead of hard-coding them, so they adapt more easily.
+
+### How ML replaces the rule-based spam filter — 3 steps
+
+**1. Get data**
+Use existing emails as examples:
+- Emails in the **spam folder** → spam examples
+- Emails in the **inbox** → non-spam examples
+
+**2. Define and calculate features**
+- The old rules (keywords, length, sender patterns, etc.) become a great **starting point for features**.
+- Each email is **encoded** into feature values + a target value:
+  - `target = 1` if from the spam folder
+  - `target = 0` if from the inbox
+
+**3. Train and use the model**
+- An ML algorithm is trained on the encoded emails (features → target).
+- The model doesn't output a hard yes/no — it outputs a **probability** that an email is spam.
+- To turn that probability into an actual decision, you must pick a **threshold** (e.g. `probability > 0.5 → spam`).
+
+### Rule-based vs ML — quick comparison
+
+| Aspect                  | Rule-Based System                  | Machine Learning System              |
+|-------------------------|-------------------------------------|----------------------------------------|
+| Logic source            | Manually written rules             | Learned from data                     |
+| Adapting to new patterns| Requires manual rule updates       | Retrain model on new data             |
+| Maintainability         | Gets complex/messy as rules grow   | Scales better as data grows           |
+| Output                  | Hard decision (yes/no)             | Probability → needs a threshold       |
+
+### Simple flow
+
+```
+Emails (spam folder + inbox)
+        │
+        ▼
+ Encode → features + target (1 = spam, 0 = not spam)
+        │
+        ▼
+   Train ML model
+        │
+        ▼
+ New email → model outputs P(spam)
+        │
+        ▼
+ Apply threshold (e.g. > 0.5) → final decision: spam / not spam
+```
+
+### Key takeaway
+
+ML systems replace brittle, manually-maintained rules with patterns **learned from labeled data (features → target)**, and produce **probabilities** rather than hard rules — which is why a **threshold** is needed to turn a prediction into a decision.
+
+📝 Community notes: [Notes from Peter Ernicke](https://knowmledge.com/2023/09/10/ml-zoomcamp-2023-introduction-to-machine-learning-part-2/)
+
+---
+
+<!-- Next lesson notes (1.3 Supervised Machine Learning) go below -->
