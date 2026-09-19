@@ -160,3 +160,64 @@ SML is about teaching a model with labeled examples (features → known targets)
 ---
 
 <!-- Next lesson notes (1.4 CRISP-DM) go below -->
+
+---
+
+## 1.4 CRISP-DM
+
+📺 [Video](https://www.youtube.com/watch?v=dCa3JvmJbr0&list=PL3MmuxUbc_hIhxl5Ji8t4O6lPAOpHaCLR&index=5) | 🖼️ [Slides](https://www.slideshare.net/AlexeyGrigorev/ml-zoomcamp-14-crispdm)
+
+### Core idea
+
+**CRISP-DM** = **Cr**oss-**I**ndustry **S**tandard **P**rocess for **D**ata **M**ining — an open, widely-used process model describing the common steps data mining/ML experts follow on a project. Conceived in 1996, it became a European Union ESPRIT project in 1997, led by five companies (ISL, Teradata, Daimler AG, NCR, and OHRA insurance).
+
+### The 6 steps
+
+```
+1. Business Understanding
+        │  (Do we even need ML? Define a measurable goal)
+        ▼
+2. Data Understanding
+        │  (What data exists? Do we need more?)
+        ▼
+3. Data Preparation
+        │  (Clean data, remove noise, build pipelines,
+        │   convert to tabular format for ML)
+        ▼
+4. Modeling
+        │  (Train multiple models, pick the best one —
+        │   may loop back to fix data/add features)
+        ▼
+5. Evaluation
+        │  (Does the model actually solve the business problem?)
+        ▼
+6. Deployment
+        (Roll out to production for all users —
+         often paired with "online evaluation")
+```
+
+| Step | Question it answers |
+|------|----------------------|
+| **1. Business Understanding** | Do we need ML for this? Is the goal measurable? |
+| **2. Data Understanding** | What data do we have/need? |
+| **3. Data Preparation** | Is the data clean and ML-ready (tabular)? |
+| **4. Modeling** | Which model performs best? |
+| **5. Evaluation** | Does it solve the actual business problem? |
+| **6. Deployment** | Roll out to production; evaluate live (online evaluation) |
+
+### Important notes
+
+- Project **maintainability** matters — not just model performance.
+- ML projects are **iterative**, not linear/one-shot:
+  1. **Start simple**
+  2. **Learn from feedback**
+  3. **Improve**
+- Evaluation and deployment often happen together in practice (**online evaluation** — testing the model with real users/traffic).
+
+### Key takeaway
+
+CRISP-DM gives ML projects a structured, repeatable lifecycle — from confirming ML is even needed, through data prep and modeling, to evaluation and deployment — with the understanding that you'll **loop back and iterate** rather than expect success on the first pass.
+
+---
+
+<!-- Next lesson notes (1.5 Model Selection Process) go below -->
