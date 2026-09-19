@@ -173,6 +173,8 @@ SML is about teaching a model with labeled examples (features → known targets)
 
 ### The 6 steps
 
+![CRISP-DM](../01_Introduction_to_Machine_Learning/images/CRISP-DM.png)
+
 ```
 1. Business Understanding
         │  (Do we even need ML? Define a measurable goal)
