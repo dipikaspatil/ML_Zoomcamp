@@ -223,3 +223,62 @@ CRISP-DM gives ML projects a structured, repeatable lifecycle — from confirmin
 ---
 
 <!-- Next lesson notes (1.5 Model Selection Process) go below -->
+
+---
+
+## 1.5 Model Selection Process
+
+📺 [Video](https://www.youtube.com/watch?v=OH_R0Sl9neM&list=PL3MmuxUbc_hIhxl5Ji8t4O6lPAOpHaCLR&index=6) | 🖼️ [Slides](https://www.slideshare.net/AlexeyGrigorev/ml-zoomcamp-15-model-selection-process)
+
+![Model Selection Process](https://img.youtube.com/vi/OH_R0Sl9neM/hqdefault.jpg)
+
+### Core idea
+
+There are many candidate models to choose from — **Logistic Regression**, **Decision Tree**, **Neural Network**, or others. The question is: **how do we pick the best one?**
+
+### Train / Validate / Test
+
+- The **validation dataset** is **not** used during training.
+- Both training and validation sets have their own **feature matrix (X)** and **target vector (y)**.
+- Process:
+  1. Fit the model on the **training** data.
+  2. Use it to **predict** y (probabilities) for the **validation** feature matrix.
+  3. **Compare** predicted vs. actual y on the validation set to measure performance.
+
+### The Multiple Comparisons Problem (MCP)
+
+- Since model outputs are **probabilistic**, a model can get **lucky** on the validation set purely by chance and look better than it really is.
+- This is the **Multiple Comparisons Problem** — testing many models increases the odds that one looks good just by luck.
+- **Solution:** hold out a separate **test set** to confirm the "best" model really is the best, independent of the validation results used to pick it.
+
+### The 6-step model selection process
+
+```
+1. Split data → Train (60%) | Validation (20%) | Test (20%)
+2. Train the candidate models on the Training set
+3. Evaluate all models on the Validation set
+4. Select the best-performing model
+5. Apply that best model to the Test set
+6. Compare Validation performance vs. Test performance
+```
+
+| Step | Purpose |
+|------|---------|
+| 1. Split data | Typically 60% train / 20% validation / 20% test |
+| 2. Train models | Fit each candidate model on training data |
+| 3. Evaluate models | Score each model on the validation set |
+| 4. Select best model | Pick the top performer from validation |
+| 5. Test best model | Run it on the untouched test set |
+| 6. Compare metrics | Validation vs. test performance should be close — confirms the choice wasn't just luck (guards against MCP) |
+
+> 💡 **Tip:** After selecting the best model (step 4), you can **combine** the training + validation datasets into one larger training set, retrain the chosen model on it, and *then* evaluate on the test set.
+
+### Key takeaway
+
+Model selection isn't just "pick whichever model scores highest on one dataset" — a proper **train/validation/test split** protects against the Multiple Comparisons Problem and gives an honest, unbiased estimate of how the chosen model will perform on truly unseen data.
+
+📝 Community notes: [Notes from Peter Ernicke](https://knowmledge.com/2023/09/13/ml-zoomcamp-2023-introduction-to-machine-learning-part-5/)
+
+---
+
+<!-- Next lesson notes (1.6 Setting up the Environment) go below -->
