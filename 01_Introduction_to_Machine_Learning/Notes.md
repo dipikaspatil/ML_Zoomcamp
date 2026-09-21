@@ -230,8 +230,6 @@ CRISP-DM gives ML projects a structured, repeatable lifecycle — from confirmin
 
 📺 [Video](https://www.youtube.com/watch?v=OH_R0Sl9neM&list=PL3MmuxUbc_hIhxl5Ji8t4O6lPAOpHaCLR&index=6) | 🖼️ [Slides](https://www.slideshare.net/AlexeyGrigorev/ml-zoomcamp-15-model-selection-process)
 
-![Model Selection Process](https://img.youtube.com/vi/OH_R0Sl9neM/hqdefault.jpg)
-
 ### Core idea
 
 There are many candidate models to choose from — **Logistic Regression**, **Decision Tree**, **Neural Network**, or others. The question is: **how do we pick the best one?**
@@ -276,8 +274,6 @@ There are many candidate models to choose from — **Logistic Regression**, **De
 ### Key takeaway
 
 Model selection isn't just "pick whichever model scores highest on one dataset" — a proper **train/validation/test split** protects against the Multiple Comparisons Problem and gives an honest, unbiased estimate of how the chosen model will perform on truly unseen data.
-
-📝 Community notes: [Notes from Peter Ernicke](https://knowmledge.com/2023/09/13/ml-zoomcamp-2023-introduction-to-machine-learning-part-5/)
 
 ---
 
