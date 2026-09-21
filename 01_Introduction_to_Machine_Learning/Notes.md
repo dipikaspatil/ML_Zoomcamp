@@ -280,3 +280,81 @@ Model selection isn't just "pick whichever model scores highest on one dataset" 
 ---
 
 <!-- Next lesson notes (1.6 Setting up the Environment) go below -->
+
+---
+
+## 1.6 Setting up the Environment
+
+### What you need
+
+- **Python 3.11** (course videos use 3.8, but 3.11 is fine)
+- **NumPy, Pandas, Scikit-Learn** (latest versions)
+- **Matplotlib and Seaborn**
+- **VS Code** with the Python extension — no notebooks needed, plain `.py` scripts work fine for everything in this course
+
+### Setup options (official)
+
+| Option | Notes |
+|--------|-------|
+| **GitHub Codespaces** | Recommended by the course for zero local setup |
+| **Anaconda / Miniconda (local)** ⭐ *(my choice)* | Easiest way to get a fully working local environment |
+| **Ubuntu 22.04 on AWS / WSL** | For a persistent cloud or Linux dev box |
+| **Cloud (AWS / GCP)** | Rent a server instead of running locally; GCP gives $300 free credits |
+| **Kaggle / Google Colab** | Good for just running notebooks, but not enough alone — later deployment modules need a real CLI + Docker |
+
+### 🖥️ Local setup with Anaconda/Miniconda (recommended path for going local)
+
+- **Anaconda** = full package (Python + tons of libraries + tools) — recommended for most people.
+- **Miniconda** = lightweight version, just Python + conda, you install libraries yourself.
+- Installers auto-detect your OS at:
+  - [Anaconda](https://www.anaconda.com/products/individual)
+  - [Miniconda](https://docs.conda.io/en/latest/miniconda.html#latest-miniconda-installer-links)
+- On Windows, you can use WSL or the plain Windows version — both work.
+
+**(Optional but recommended) Create a dedicated environment for the course:**
+
+```bash
+# Create an isolated environment with Python 3.11
+conda create -n ml-zoomcamp python=3.11
+
+# Activate it (do this every time you work on the course)
+conda activate ml-zoomcamp
+
+# Install the core libraries
+conda install numpy pandas scikit-learn seaborn
+```
+
+> 📌 You'll install **XGBoost** and **TensorFlow** later in the course, when those modules actually need them — skip for now.
+
+### 🧩 Using VS Code with plain `.py` scripts (no notebooks)
+
+The course's default instructions use Jupyter notebooks, but everything can be done in plain `.py` files run from VS Code — no `.ipynb`, no browser tab.
+
+1. Install the **Python** extension in VS Code (Extensions marketplace) — that's the only extension needed.
+2. Open your project folder in VS Code.
+3. Select the **`ml-zoomcamp`** conda environment as your interpreter: `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) → **"Python: Select Interpreter"** → pick the one showing `ml-zoomcamp`.
+4. Write your code in a `.py` file and run it either:
+   - via the ▶ **Run** button (top-right), or
+   - by opening a terminal (``Ctrl+` ``), activating the env (`conda activate ml-zoomcamp`), and running `python your_script.py`.
+5. For quick exploration (viewing a DataFrame, plotting, etc.), just use `print()` statements, or add `# %%` above a block of code — VS Code will show a "Run Cell" link above it and open results in an interactive panel, without ever creating a real `.ipynb` file.
+
+### Alternative: running in the cloud instead of locally
+
+- **AWS** — [Creating an AWS account](https://mlbookcamp.com/article/aws), [Renting an EC2 instance](https://mlbookcamp.com/article/aws-ec2)
+- **GCP** — $300 free credits on sign-up, usable for the whole course
+- For **WSL**: install Docker Desktop on Windows — it's automatically available inside WSL, no separate `docker.io` install needed
+
+### Notebook-only services (Kaggle / Google Colab)
+
+Useful for quickly running notebooks, but **not sufficient alone** — later modules (deployment) require command-line access with Docker, Python, etc.
+
+- **Kaggle:** open a notebook via `https://kaggle.com/kernels/welcome?src=<notebook-url>`, then `!wget <raw-datafile-url>` inside a code cell to pull any CSV the notebook needs.
+- **Google Colab:** same idea — just replace `https://github.com/` with `https://colab.research.google.com/github/` in the notebook's URL.
+
+### Key takeaway
+
+For chapter 1, a local **Anaconda/Miniconda environment** (`conda create -n ml-zoomcamp python=3.11` → `conda activate ml-zoomcamp` → `conda install numpy pandas scikit-learn seaborn`) plus **VS Code** with the Python extension gives you a self-contained, fully local setup — writing and running plain `.py` scripts, with no notebooks and no dependency on cloud free-tiers.
+
+---
+
+<!-- Next lesson notes (1.7 Introduction to NumPy) go below -->
