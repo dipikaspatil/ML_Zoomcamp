@@ -236,6 +236,8 @@ There are many candidate models to choose from — **Logistic Regression**, **De
 
 ### Train / Validate / Test
 
+![Train_Validate_Test](../01_Introduction_to_Machine_Learning/images/Train_Validate_Test.png)
+
 - The **validation dataset** is **not** used during training.
 - Both training and validation sets have their own **feature matrix (X)** and **target vector (y)**.
 - Process:
