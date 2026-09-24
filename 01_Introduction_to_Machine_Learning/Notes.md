@@ -495,3 +495,128 @@ NumPy arrays behave like supercharged Python lists: **element-wise operations, c
 ---
 
 <!-- Next lesson notes (1.8 Linear Algebra Refresher) go below -->
+
+---
+
+## 1.8 Linear Algebra Refresher
+
+📺 [Video](https://www.youtube.com/watch?v=zZyKUeOR4Gg&list=PL3MmuxUbc_hIhxl5Ji8t4O6lPAOpHaCLR&index=8) | 🖼️ [Slides](https://www.slideshare.net/AlexeyGrigorev/ml-zoomcamp-18-linear-algebra-refresher)
+
+### Core idea
+
+A refresher on the linear algebra operations that power ML under the hood: **vector operations, multiplication (vector-vector, matrix-vector, matrix-matrix), the identity matrix, and matrix inverse.**
+
+### Vector operations
+
+```python
+u = np.array([2, 7, 5, 6])
+v = np.array([3, 4, 8, 6])
+
+# addition
+u + v
+
+# subtraction
+u - v
+
+# scalar multiplication
+2 * v
+```
+
+### Multiplication
+
+**Vector-vector multiplication** (a.k.a. dot product) — multiply corresponding elements and sum the results:
+
+```python
+def vector_vector_multiplication(u, v):
+    assert u.shape[0] == v.shape[0]
+
+    n = u.shape[0]
+    result = 0.0
+
+    for i in range(n):
+        result = result + u[i] * v[i]
+
+    return result
+```
+
+**Matrix-vector multiplication** — each row of the matrix is dotted with the vector, reusing the function above:
+
+```python
+def matrix_vector_multiplication(U, v):
+    assert U.shape[1] == v.shape[0]
+
+    num_rows = U.shape[0]
+    result = np.zeros(num_rows)
+
+    for i in range(num_rows):
+        result[i] = vector_vector_multiplication(U[i], v)
+
+    return result
+```
+
+**Matrix-matrix multiplication** — treat matrix V as a set of column vectors, and matrix-vector-multiply each column against U:
+
+```python
+def matrix_matrix_multiplication(U, V):
+    assert U.shape[1] == V.shape[0]
+
+    num_rows = U.shape[0]
+    num_cols = V.shape[1]
+    result = np.zeros((num_rows, num_cols))
+
+    for i in range(num_cols):
+        vi = V[:, i]
+        Uvi = matrix_vector_multiplication(U, vi)
+        result[:, i] = Uvi
+
+    return result
+```
+
+> 💡 In practice, you'd just use NumPy's built-in `U.dot(v)` or `U @ v` instead of hand-rolling these — but implementing them manually helps make clear what's actually happening under the hood.
+
+### Identity matrix
+
+The identity matrix **I** is the matrix equivalent of the number 1 — multiplying any matrix by it leaves the matrix unchanged (`A @ I = A`).
+
+```python
+I = np.eye(3)   # 3x3 identity matrix
+```
+
+### Inverse
+
+The **inverse** of a square matrix `V`, written `V⁻¹`, is the matrix such that `V @ V⁻¹ = I`. Not every matrix has one (it must be square and non-singular).
+
+```python
+V = np.array([
+    [1, 1, 2],
+    [0, 0.5, 1],
+    [0, 2, 1],
+])
+
+inv = np.linalg.inv(V)   # compute the inverse
+```
+
+### Quick reference table
+
+| Operation | NumPy way | Purpose |
+|-----------|-----------|---------|
+| Vector add/subtract | `u + v` / `u - v` | Element-wise combination |
+| Scalar multiplication | `2 * v` | Scale every element |
+| Dot product | `u.dot(v)` or `u @ v` | Vector-vector multiplication |
+| Matrix-vector product | `U.dot(v)` or `U @ v` | Apply a matrix to a vector |
+| Matrix-matrix product | `U.dot(V)` or `U @ V` | Combine two matrices |
+| Identity matrix | `np.eye(n)` | The "do-nothing" matrix |
+| Matrix inverse | `np.linalg.inv(V)` | Matrix such that `V @ V⁻¹ = I` |
+
+### Key takeaway
+
+These vector/matrix operations — especially the **dot product** and **matrix multiplication** — are the computational backbone of ML algorithms like linear regression; NumPy implements all of them efficiently, so in practice you'll rarely write the manual loop versions shown above, but understanding them clarifies what's happening when a model "trains."
+
+📚 Links:
+- [Notebook from the video](https://github.com/DataTalksClub/machine-learning-zoomcamp/blob/main/01-intro/notebooks/08-linear-algebra.ipynb)
+- [Visual understanding of matrix multiplication](http://matrixmultiplication.xyz/)
+
+---
+
+<!-- Next lesson notes (1.9 Introduction to Pandas) go below -->
+
