@@ -620,3 +620,187 @@ These vector/matrix operations — especially the **dot product** and **matrix m
 
 <!-- Next lesson notes (1.9 Introduction to Pandas) go below -->
 
+---
+
+## 1.9 Introduction to Pandas
+
+### Core idea
+
+**Pandas** is the library for manipulating tabular data in Python. This lesson (the last of Chapter 1) covers: DataFrames & Series, indexing, element-wise ops, filtering, string ops, summarizing ops, missing values, and grouping.
+
+```python
+import numpy as np
+import pandas as pd
+```
+
+### DataFrames
+
+The core Pandas structure is the **DataFrame** — basically a table.
+
+```python
+data = [
+    ['Nissan', 'Stanza', 1991, 138, 4, 'MANUAL', 'sedan', 2000],
+    ['Hyundai', 'Sonata', 2017, None, 4, 'AUTOMATIC', 'Sedan', 27150],
+    ['Lotus', 'Elise', 2010, 218, 4, 'MANUAL', 'convertible', 54990],
+    ['GMC', 'Acadia',  2017, 194, 4, 'AUTOMATIC', '4dr SUV', 34450],
+    ['Nissan', 'Frontier', 2017, 261, 6, 'MANUAL', 'Pickup', 32340],
+]
+
+columns = [
+    'Make', 'Model', 'Year', 'Engine HP', 'Engine Cylinders',
+    'Transmission Type', 'Vehicle_Style', 'MSRP'
+]
+
+df = pd.DataFrame(data, columns=columns)
+```
+
+You can also build a DataFrame from a **list of dictionaries** — Pandas infers the column names from the dict keys automatically:
+
+```python
+data = [
+    {"Make": "Nissan", "Model": "Stanza", "Year": 1991, "Engine HP": 138.0,
+     "Engine Cylinders": 4, "Transmission Type": "MANUAL",
+     "Vehicle_Style": "sedan", "MSRP": 2000},
+    # ...
+]
+df = pd.DataFrame(data)
+```
+
+```python
+df.head(n=2)   # preview the first n rows — good habit right after loading any DataFrame
+```
+
+### Series
+
+Every **column** of a DataFrame is a **Series**.
+
+```python
+df.Make                     # dot notation
+df['Engine HP']             # bracket notation (required if the column name has spaces/dashes)
+df[['Make', 'Model', 'MSRP']]   # select multiple columns -> returns a DataFrame
+
+df['id'] = [1, 2, 3, 4, 5]  # add a new column
+del df['id']                 # delete a column
+```
+
+### Index
+
+The numbers on the left of a DataFrame (0, 1, 2...) are the **index** — how you refer to rows.
+
+```python
+df.index              # RangeIndex(start=0, stop=5, step=1)
+
+df.loc[1]              # access row(s) by index label
+df.index = ['a', 'b', 'c', 'd', 'e']   # replace the index, e.g. with letters
+
+df.loc[['b', 'c']]      # now referenced by the new labels
+df.iloc[[1, 2, 4]]      # positional index (0-4) still works via iloc, regardless of the label index
+
+df = df.reset_index(drop=True)   # reset back to a sequential 0..n index
+# drop=True discards the old index values instead of keeping them as a new column
+```
+
+### Element-wise operations
+
+Just like NumPy — operations apply to every element in a Series:
+
+```python
+df['Engine HP'] * 2       # multiplies every value; NaN stays NaN
+df['Year'] >= 2015         # comparison -> boolean Series
+```
+
+### Filtering
+
+```python
+df[df['Year'] >= 2015]                          # rows where the condition is True
+df[df['Make'] == 'Nissan']                       # filter by exact match
+
+# combine conditions with & (and), | (or) — wrap each condition in parentheses
+df[(df['Make'] == 'Nissan') & (df['Year'] >= 2015)]
+```
+
+### String operations
+
+NumPy doesn't handle strings well — Pandas does, via `.str`:
+
+```python
+df['Vehicle_Style'].str.lower()                     # lowercase every value
+df['Vehicle_Style'].str.replace(' ', '_')             # replace spaces with underscores
+
+# chain operations, then overwrite the column with the cleaned version
+df['Vehicle_Style'] = df['Vehicle_Style'].str.replace(' ', '_').str.lower()
+```
+
+> String methods return a **new** Series — they don't modify in place, so you need to reassign.
+
+### Summarizing operations
+
+```python
+df.MSRP.mean()      # average
+df.MSRP.max()        # maximum
+df.MSRP.describe()    # count, mean, std, min, 25/50/75th percentiles, max — all at once
+
+df.describe().round(2)   # describe() on the whole df -> stats for every numeric column
+
+df.Make.nunique()    # number of unique values in a column
+df.nunique()          # unique value counts for every column
+```
+
+### Missing values
+
+```python
+df.isnull().sum()   # count of missing (NaN) values per column
+```
+
+### Grouping
+
+Equivalent to SQL's `GROUP BY`:
+
+```sql
+SELECT transmission_type, AVG(MSRP)
+FROM cars
+GROUP BY transmission_type
+```
+
+```python
+df.groupby('Transmission Type').MSRP.max()   # max price per transmission type
+# .mean(), .min(), etc. all work the same way
+```
+
+### Getting the NumPy arrays back
+
+Everything in Pandas is backed by NumPy under the hood:
+
+```python
+df.MSRP.values                        # get the underlying NumPy array from a Series
+
+df.to_dict(orient='records')           # convert the DataFrame back to a list of dicts
+```
+
+### Quick reference table
+
+| Task | Code |
+|------|------|
+| Preview data | `df.head(n)` |
+| Select column(s) | `df['col']`, `df[['c1','c2']]` |
+| Add/delete column | `df['new'] = [...]`, `del df['col']` |
+| Row by label / position | `df.loc[label]` / `df.iloc[pos]` |
+| Reset index | `df.reset_index(drop=True)` |
+| Filter rows | `df[condition]`, combine with `&` / `\|` |
+| String ops | `df['col'].str.lower()`, `.str.replace(a, b)` |
+| Stats | `.mean() .max() .min() .describe()` |
+| Unique values | `.nunique()` |
+| Missing values | `df.isnull().sum()` |
+| Group + aggregate | `df.groupby('col').target.agg()` |
+| To NumPy array | `df.col.values` |
+| To list of dicts | `df.to_dict(orient='records')` |
+
+### Key takeaway
+
+Pandas DataFrames/Series wrap NumPy arrays with labels (index + column names), adding SQL-like operations (filtering, `groupby`) and string handling that raw NumPy lacks — this combination (load → inspect → clean → filter → summarize) is the standard workflow for prepping tabular data before feeding it into an ML model.
+
+📚 Links: [Notebook](https://github.com/alexeygrigorev/mlbookcamp-code/blob/master/appendix-d-pandas.ipynb) · [Pandas Cheat sheet](https://www.datacamp.com/community/blog/python-pandas-cheat-sheet)
+
+---
+
+<!-- Next lesson notes (1.10 Summary) go below -->
