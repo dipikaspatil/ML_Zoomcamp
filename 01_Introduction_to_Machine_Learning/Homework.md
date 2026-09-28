@@ -99,10 +99,10 @@ final count of columns that have at least one missing value 2
 #### Q5. Max fuel efficiency
 What's the maximum fuel efficiency of cars from Asia?
 
-21.2
-31.2
-41.2 <-- answer
-51.2
+- 21.2
+- 31.2
+- 41.2 <-- answer
+- 51.2
 
 ```shell
 (venv) >> % python3 q5_max_fuel_efficiency.py
@@ -116,9 +116,9 @@ Use the fillna method to fill the missing values in the horsepower column with t
 Now, calculate the median value of horsepower once again.
 Has it changed?
 
-Yes, it increased
-Yes, it decreased <-- answer
-No
+- Yes, it increased
+- Yes, it decreased <-- answer
+- No
 
 ```shell
 (venv) >> % python3 q6_median_value_of_horsepower.py
@@ -140,10 +140,10 @@ median horsepower after : 252.0
 What's the sum of all the elements of the result?
 Note: You just implemented linear regression. We'll talk about it in the next lesson.
 
-0.0369
-0.369 <-- answer
-3.69
-36.9
+- 0.0369
+- 0.369 <-- answer
+- 3.69
+- 36.9
 
 ```shell
 (venv) >> % python3 q7_sum_of_weights.py
