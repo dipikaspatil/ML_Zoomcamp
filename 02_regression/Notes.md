@@ -439,3 +439,264 @@ df.head()
 
 - Previous: 2.1 Car price prediction project
 - Next: 2.3 Exploratory data analysis (EDA)
+
+# 2.3 Exploratory Data Analysis (EDA)
+
+**Chapter 2: Machine Learning for Regression**
+
+- Lesson video: https://www.youtube.com/watch?v=k6k8sQ0GhPM&list=PL3MmuxUbc_hIhxl5Ji8t4O6lPAOpHaCLR&index=14
+- Slides: https://www.slideshare.net/AlexeyGrigorev/ml-zoomcamp-2-slides
+- Course notes: https://github.com/DataTalksClub/machine-learning-zoomcamp/blob/main/02-regression/03-eda.md
+- Full notebook: https://github.com/alexeygrigorev/mlbookcamp-code/blob/master/chapter-02-car-price/02-carprice.ipynb
+
+---
+
+## 1. Goal of this lesson
+
+EDA means looking carefully at the data **before** training a model. We want to know:
+
+- What values do the columns contain?
+- How many distinct values does each column have?
+- What does the **target** (`msrp`) distribution look like?
+- Are there **missing values**?
+
+The most important finding in this lesson: the price distribution has a **long tail**, and we should fix that with a **log transformation** before modelling.
+
+### Diagram: EDA workflow
+
+```mermaid
+flowchart TD
+    A["Clean DataFrame"] --> B["Inspect each column: unique and nunique"]
+    B --> C["Plot target distribution: histplot of msrp"]
+    C --> D{"Long tail?"}
+    D -- Yes --> E["Apply np.log1p to the target"]
+    D -- No --> F["Keep the target as is"]
+    E --> G["Check missing values: isnull().sum()"]
+    F --> G
+    G --> H["Ready for the validation framework"]
+```
+
+---
+
+## 2. Terms explained
+
+**EDA (Exploratory Data Analysis)**
+Summarizing and visualizing a dataset to understand its structure, quality, and patterns before modelling.
+
+**Target variable**
+The value we want to predict. Here it is `msrp`.
+
+**Distribution**
+How the values of a variable are spread out: where most values lie, how spread out they are, and whether there are extreme values.
+
+**Histogram**
+A bar chart that groups values into ranges (bins) and shows how many observations fall in each bin.
+
+**Long tail (skewed distribution)**
+Most values are concentrated in a small range, but a few very large values stretch the distribution far to one side. Car prices are like this: most cars cost a few thousand to a few tens of thousands of dollars, while a few luxury cars cost over a million.
+
+**Normal distribution**
+The symmetric bell-shaped curve. Many ML models, linear regression included, work better when the target looks roughly like this.
+
+**Log transformation**
+Replacing each value `x` with `log(x)`. It compresses large values much more than small ones, so a long tail becomes a more symmetric shape.
+
+**Null / missing value (NaN)**
+An empty cell, meaning the value is unknown. We must detect these and deal with them before training.
+
+**Bins**
+The number of intervals a histogram uses. More bins give a more detailed picture.
+
+---
+
+## 3. Setup (from the previous lessons)
+
+```python
+import pandas as pd
+import numpy as np
+
+import seaborn as sns
+from matplotlib import pyplot as plt
+
+%matplotlib inline
+
+df = pd.read_csv('data.csv')
+
+df.columns = df.columns.str.lower().str.replace(' ', '_')
+
+strings = list(df.dtypes[df.dtypes == 'object'].index)
+for col in strings:
+    df[col] = df[col].str.lower().str.replace(' ', '_')
+```
+
+`%matplotlib inline` makes sure plots are displayed inside the notebook cell.
+
+---
+
+## 4. Looking at each column
+
+### Unique values and counts
+
+For every column, look at a few unique values and how many there are in total:
+
+```python
+for col in df.columns:
+    print(col)
+    print(df[col].unique()[:5])
+    print(df[col].nunique())
+    print()
+```
+
+What the methods do:
+
+- `df[col].unique()` returns an array of the distinct values in the column
+- `[:5]` takes only the first 5 so the output stays readable
+- `df[col].nunique()` returns the **number** of distinct values
+
+Why this is useful:
+
+- A column with very few unique values (for example `transmission_type`) is **categorical**.
+- A column with many unique values (for example `msrp`, `popularity`) is **numerical**.
+- Columns like `year` or `number_of_doors` are numbers but have few values. We will treat them carefully later.
+
+---
+
+## 5. Distribution of the target (price)
+
+### Plot the histogram
+
+```python
+sns.histplot(df.msrp, bins=50)
+```
+
+![histogram_long_tail](../02_regression/images/histogram_long_tail.png)
+
+You will see a very tall bar at the left (cheap cars) and a thin line stretching far to the right (expensive cars). That is the **long tail**.
+
+### Zoom into the main part
+
+To see the bulk of the data more clearly, plot only cars below 100,000:
+
+```python
+sns.histplot(df.msrp[df.msrp < 100000], bins=50)
+```
+![histogram_long_tail_zoomed](../02_regression/images/histogram_long_tail_zoomed.png)
+
+
+Even this zoomed view is still skewed and not a bell shape. The extreme values are the real problem, not just the way we plot.
+
+### Why the long tail is a problem
+
+- A few very expensive cars dominate the error calculation.
+- The model tries hard to fit these rare values and does worse on the typical cars.
+- Linear regression behaves better when the target is roughly normal.
+
+---
+
+## 6. Log transformation
+
+Apply a logarithm to the price to squeeze the large values:
+
+```python
+price_logs = np.log(df.msrp)
+```
+
+Problem: `log(0)` is undefined. If any price is 0 this breaks. The safe approach is `log1p`, which computes `log(x + 1)`:
+
+```python
+price_logs = np.log1p(df.msrp)
+```
+
+Plot it:
+
+```python
+sns.histplot(price_logs, bins=50)
+```
+
+![histogram_long_tail_log_transformation](../02_regression/images/histogram_long_tail_log_transformation.png)
+
+The long tail is gone and the shape is much closer to a normal bell curve.
+
+### Diagram: effect of the log transformation
+
+The image below uses **synthetic data** to illustrate the idea. Your real histogram of `msrp` will look similar in shape: a tall bar on the left and a thin tail to the right, which becomes a bell shape after `log1p`.
+
+![Before and after log transformation](../02_regression/images/2.3-log-transform.png)
+
+```mermaid
+flowchart LR
+    A["Raw price: long tail"] -->|"np.log1p"| B["Log price: close to normal"]
+    B --> C["Train the model on log price"]
+    C --> D["Predictions in log scale"]
+    D -->|"np.expm1"| E["Predictions in dollars"]
+```
+
+### Quick intuition
+
+| Price | log1p(price) |
+|-------|--------------|
+| 1,000 | about 6.9 |
+| 10,000 | about 9.2 |
+| 100,000 | about 11.5 |
+| 1,000,000 | about 13.8 |
+
+A 1000x difference in price becomes only about a 7-point difference in log scale. Large values are compressed, small values are barely changed.
+
+### Important for later
+
+If we train the model on the **log price**, its predictions are also log prices. To get real dollars back, we reverse the transformation with `np.expm1()`:
+
+```python
+price = np.expm1(price_logs)
+```
+
+We will use this when we train and evaluate the model.
+
+---
+
+## 7. Missing values
+
+Count the missing values per column:
+
+```python
+df.isnull().sum()
+```
+
+How it works:
+
+- `df.isnull()` gives a table of True/False (True where the value is missing)
+- `.sum()` adds up the True values per column, because True counts as 1
+
+In this dataset a few columns have missing values (for example `engine_hp`, `engine_cylinders`, `number_of_doors`, `market_category`). We will handle them in the next lessons, since linear regression cannot work with NaN.
+
+---
+
+## 8. Cheat sheet from this lesson
+
+| Code | What it does |
+|------|--------------|
+| `df[col].unique()` | Distinct values of a column |
+| `df[col].nunique()` | Number of distinct values |
+| `df.isnull().sum()` | Number of missing values per column |
+| `sns.histplot(series, bins=50)` | Histogram of a series |
+| `%matplotlib inline` | Show plots inside the notebook |
+| `np.log1p(x)` | log(x + 1), safe log transform |
+| `np.expm1(x)` | Inverse of log1p, back to the original scale |
+
+---
+
+## 9. Key takeaways
+
+- Always do EDA before modelling. Look at values, unique counts, the target distribution, and missing values.
+- Car prices have a **long tail**. This confuses many ML models.
+- Apply **log1p** to the target to make its distribution closer to normal.
+- Use `log1p` instead of `log` so a value of 0 does not break the code.
+- Remember to convert predictions back with `expm1` when you need real prices.
+- Check for missing values with `df.isnull().sum()`. We must deal with them before training.
+
+---
+
+## 10. Navigation
+
+- Previous: 2.2 Data preparation
+- Next: 2.4 Setting up the validation framework
