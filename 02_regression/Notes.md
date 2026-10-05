@@ -1044,3 +1044,285 @@ del df_test['msrp']
 
 - Previous: 2.3 Exploratory data analysis
 - Next: 2.5 Linear regression (simple version)
+
+# 2.5 Linear Regression (Simple Version)
+
+**Chapter 2: Machine Learning for Regression**
+
+- Lesson video: https://www.youtube.com/watch?v=Dn1eTQLsOdA&list=PL3MmuxUbc_hIhxl5Ji8t4O6lPAOpHaCLR&index=16
+- Course notes: https://github.com/DataTalksClub/machine-learning-zoomcamp/blob/main/02-regression/05-linear-regression-simple.md
+
+---
+
+## 1. Goal of this lesson
+
+We look at **linear regression**, the model used to predict numbers such as car prices. In this lesson we:
+
+1. Write the formula for **one car** (one row of data)
+2. Implement it in Python with a simple loop
+3. See what the final prediction is made of
+4. Convert the prediction from log price back to dollars
+
+The weights in this lesson are invented by us. Learning them from data comes in later lessons.
+
+### Diagram: lesson flow
+
+```mermaid
+flowchart LR
+    A["One car: feature vector xi"] --> B["Formula: bias + weighted features"]
+    B --> C["Python loop"]
+    C --> D["Prediction in log scale"]
+    D -->|"np.expm1"| E["Price in dollars"]
+```
+
+---
+
+## 2. Terms explained
+
+**Model (g)**
+A function that takes features and returns a prediction. We write `g(X) ≈ y`: the model applied to the features should be close to the target.
+
+**Observation**
+One example, here one car. It corresponds to one row of the feature matrix.
+
+**Feature vector (xi)**
+The list of feature values for one car. `xi1` is the first feature of car number `i`, `xi2` the second, and so on.
+
+**Weights (w1, w2, ...)**
+One number per feature. A weight says how much that feature pushes the prediction up or down. A bigger weight means a stronger influence.
+
+**Bias term (w0)**
+The starting value of the prediction, used before looking at any feature. It is what we would predict for a car if we knew nothing about it.
+
+**Linear**
+The prediction is a plain weighted sum: each feature is multiplied by a number and the results are added. No squares, no products between features.
+
+**Vector-vector multiplication (dot product)**
+Multiply two lists element by element and add everything up. The sum in the formula is exactly this, which is why a compact vector form exists (next lesson).
+
+**Inverse function**
+A function that undoes another one. `np.expm1` undoes `np.log1p`.
+
+---
+
+## 3. The idea in one picture
+
+### Diagram: how the model combines the features
+
+```mermaid
+flowchart TD
+    B["Bias w0 = 7.17"] --> S(("+"))
+    H["Horsepower 453 x w1 0.01"] --> S
+    M["City mpg 11 x w2 0.04"] --> S
+    P["Popularity 86 x w3 0.002"] --> S
+    S --> R["Prediction = 12.312 (log price)"]
+```
+
+---
+
+## 4. The formula for one car
+
+For one car we write the feature vector as `xi`. Our example is row 10 of the training data, a Rolls-Royce Phantom Drophead Coupe from 2015. We use only three features:
+
+- engine horsepower: 453
+- city miles per gallon: 11
+- popularity: 86 (number of mentions on Twitter)
+
+```python
+xi = [453, 11, 86]
+```
+
+The linear regression formula for this car:
+
+$$g(x_i) = w_0 + w_1 \cdot x_{i1} + w_2 \cdot x_{i2} + w_3 \cdot x_{i3}$$
+
+The same thing with a sum over the features (`j` goes from 1 to n, here n = 3):
+
+$$g(x_i) = w_0 + \sum_{j=1}^{n} w_j \cdot x_{ij}$$
+
+Reading it in words: start from the bias, then for every feature multiply it by its weight and add the result.
+
+---
+
+## 5. Implementing it in Python
+
+Here are the parameters. These weights are made up for illustration:
+
+```python
+xi = [453, 11, 86]
+
+w0 = 7.17
+w = [0.01, 0.04, 0.002]
+```
+
+The function:
+
+```python
+def linear_regression(xi):
+    n = len(xi)
+
+    pred = w0
+
+    for j in range(n):
+        pred = pred + w[j] * xi[j]
+
+    return pred
+```
+
+How it works:
+
+- `pred` starts at the bias `w0`
+- the loop visits each feature, multiplies it by its weight, and adds it to `pred`
+- the math formula counts features from 1 to n, but Python counts from 0 to n-1, so `range(n)` is the right loop
+
+Try it:
+
+```python
+linear_regression(xi)
+```
+
+Output:
+
+```
+12.312
+```
+
+---
+
+## 6. What is the prediction made of?
+
+The result is a sum of four parts:
+
+```
+7.17 + 453 * 0.01 + 11 * 0.04 + 86 * 0.002 = 12.312
+```
+
+![Breakdown of the prediction](../02_regression/images/2.5-prediction-breakdown.png)
+
+| Part | Calculation | Contribution | Meaning |
+|------|-------------|--------------|---------|
+| Bias | 7.17 | 7.170 | Prediction when we know nothing about the car |
+| Horsepower | 453 x 0.01 | 4.530 | Each extra horsepower adds 0.01. More power, higher price |
+| City mpg | 11 x 0.04 | 0.440 | Each extra unit adds 0.04. In this data, thirstier cars tend to be fancier |
+| Popularity | 86 x 0.002 | 0.172 | Tiny weight, so it barely moves the price |
+
+Notes on interpreting weights:
+
+- A **positive** weight pushes the prediction up as the feature grows. A negative weight pushes it down.
+- A weight only tells you about the relationship in the data. It does not prove that the feature causes the price.
+- The size of a contribution depends on both the weight and the feature scale. Popularity has a small weight, but features with big values can still matter.
+
+---
+
+## 7. From log price back to dollars
+
+The number 12.312 is **not** a price in dollars. In lesson 2.3 we trained on `np.log1p(msrp)`, so the model outputs a **log price**. To get dollars, apply the inverse function:
+
+```python
+import numpy as np
+
+np.expm1(12.312)
+```
+
+Output:
+
+```
+222347.2221101062
+```
+
+So the predicted price is about 222,000 dollars.
+
+`expm1` and `log1p` undo each other:
+
+```python
+np.log1p(222347.2221101062)
+```
+
+Output:
+
+```
+12.312
+```
+
+### Diagram: log scale and back
+
+```mermaid
+flowchart LR
+    A["Price in dollars: 222347"] -->|"np.log1p"| B["Log price: 12.312"]
+    B -->|"np.expm1"| A
+```
+
+---
+
+## 8. Compact vector form (preview of next lesson)
+
+The sum over features is a **dot product** between the feature vector and the weight vector. So the formula can be written as:
+
+$$g(x_i) = w_0 + x_i^T \cdot w$$
+
+Where:
+
+- `x_i^T` is the feature vector of car i
+- `w` is the vector of weights
+- the dot product multiplies matching elements and adds them up
+
+The next lesson uses this form to predict for **all cars at once**, with no Python loop.
+
+---
+
+## 9. Full code of the lesson
+
+```python
+import numpy as np
+
+xi = [453, 11, 86]
+
+w0 = 7.17
+w = [0.01, 0.04, 0.002]
+
+def linear_regression(xi):
+    n = len(xi)
+
+    pred = w0
+
+    for j in range(n):
+        pred = pred + w[j] * xi[j]
+
+    return pred
+
+pred_log = linear_regression(xi)     # 12.312, in log scale
+pred_price = np.expm1(pred_log)      # about 222347, in dollars
+
+print(pred_log, pred_price)
+```
+
+---
+
+## 10. Cheat sheet
+
+| Symbol or code | Meaning |
+|----------------|---------|
+| `g(X) ≈ y` | Model applied to features should be close to the target |
+| `xi` | Feature vector of one car |
+| `w0` | Bias term |
+| `w` | Weights, one per feature |
+| `g(xi) = w0 + sum(wj * xij)` | Linear regression for one car |
+| `np.expm1(x)` | Inverse of `np.log1p`, converts log price to price |
+
+---
+
+## 11. Key takeaways
+
+- Linear regression predicts a number as **bias + weighted sum of the features**.
+- Each weight tells how strongly one feature moves the prediction.
+- The bias is the prediction when nothing is known about the car.
+- For one car, the formula is a short Python loop over the features.
+- Our model predicts **log price**, so we convert with `np.expm1` to get dollars.
+- The weights here were made up. Finding good weights from data is the real training step, coming next.
+
+---
+
+## 12. Navigation
+
+- Previous: 2.4 Setting up the validation framework
+- Next: 2.6 Linear regression: vector form
