@@ -1326,3 +1326,357 @@ print(pred_log, pred_price)
 
 - Previous: 2.4 Setting up the validation framework
 - Next: 2.6 Linear regression: vector form
+
+# 2.6 Linear Regression: Vector Form
+
+**Chapter 2: Machine Learning for Regression**
+
+- Lesson video: https://www.youtube.com/watch?v=YkyevnYyAww&list=PL3MmuxUbc_hIhxl5Ji8t4O6lPAOpHaCLR&index=17
+- Course notes: https://github.com/DataTalksClub/machine-learning-zoomcamp/blob/main/02-regression/06-linear-regression-vector.md
+
+> Formula tip: every formula below is written twice, once as LaTeX (`$$` block) and once as plain text underneath. If your editor does not render math, the plain-text line still reads correctly.
+
+---
+
+## 1. Goal of this lesson
+
+Last lesson we predicted the price of one car with a loop. Now we make it shorter and faster in three steps:
+
+1. Recognize the sum as a **dot product**
+2. Hide the bias term inside the dot product with a **fictional feature** that is always 1
+3. Predict for **all cars at once** with a **matrix-vector multiplication**
+
+### Diagram: from loop to matrix
+
+```mermaid
+flowchart TD
+    A["Loop over features for one car"] --> B["Dot product: xi and w"]
+    B --> C["Add fictional feature 1 to absorb the bias w0"]
+    C --> D["Stack all cars into matrix X"]
+    D --> E["Predictions for all cars: X times w"]
+```
+
+---
+
+## 2. Terms explained
+
+**Dot product**
+Multiply two vectors element by element, then add the results. Two vectors of the same length give one number.
+
+**Transpose (T)**
+Flip a vector or matrix. In the formula `xi^T w`, the transpose is just the notation that says "dot product of xi and w". In NumPy code you do not need to transpose anything.
+
+**Matrix**
+A 2-D table of numbers. Our feature matrix `X` has one row per car and one column per feature.
+
+**Matrix-vector multiplication**
+Take each row of the matrix, do the dot product with the vector, and collect the results into a new vector. One result per row.
+
+**Fictional (dummy) feature**
+An extra feature `xi0` that equals 1 for every car. It exists only so the bias term can be treated like any other weight.
+
+**Vectorization**
+Replacing Python loops with matrix or vector operations. It is shorter, and NumPy runs it much faster.
+
+**Shape**
+The size of an array: `(rows, columns)`. Here `X` is (m cars, n+1 columns).
+
+---
+
+## 3. The dot product
+
+Reminder from the last lesson, for one car:
+
+$$
+g(x_i) = w_0 + \sum_{j=1}^{n} x_{ij} \cdot w_j
+$$
+
+Plain text:
+
+```
+g(xi) = w0 + sum over j=1..n of ( xij * wj )
+```
+
+The sum is exactly a dot product between the feature vector and the weight vector. So we can write:
+
+$$
+g(x_i) = w_0 + x_i^T w
+$$
+
+Plain text:
+
+```
+g(xi) = w0 + dot(xi, w)
+```
+
+### Python: dot product by hand
+
+```python
+def dot(xi, w):
+    n = len(xi)
+
+    res = 0.0
+
+    for j in range(n):
+        res = res + xi[j] * w[j]
+
+    return res
+```
+
+Now linear regression becomes very short:
+
+```python
+xi = [453, 11, 86]
+w0 = 7.17
+w = [0.01, 0.04, 0.002]
+
+def linear_regression(xi):
+    return w0 + dot(xi, w)
+```
+
+---
+
+## 4. The fictional feature
+
+The bias `w0` still sits alone, outside the dot product. The trick: pretend every car has an extra feature `xi0` that is always 1. Then both vectors get one more element at the front:
+
+```
+w  = [w0, w1, w2, ..., wn]       (n + 1 values)
+xi = [1,  xi1, xi2, ..., xin]    (n + 1 values)
+```
+
+Why this works: in the dot product, `w0` is multiplied by 1, so it stays unchanged. The rest is the same sum as before. The result is identical, but the whole formula is now a single dot product:
+
+$$
+g(x_i) = x_i^T w
+$$
+
+Plain text:
+
+```
+g(xi) = dot(xi_with_leading_1, w_with_w0)
+```
+
+### Diagram: absorbing the bias
+
+```mermaid
+flowchart LR
+    subgraph BEFORE["Before"]
+        B1["w0 + dot of 3 features and 3 weights"]
+    end
+    subgraph AFTER["After"]
+        A1["dot of 4 values and 4 weights"]
+    end
+    BEFORE -->|"prepend 1 to xi, prepend w0 to w"| AFTER
+```
+
+### Python: prepending with list concatenation
+
+In Python, `[a] + list` creates a new list with `a` at the front:
+
+```python
+w_new = [w0] + w
+w_new
+```
+
+Output:
+
+```
+[7.17, 0.01, 0.04, 0.002]
+```
+
+Same for the features:
+
+```python
+def linear_regression(xi):
+    xi = [1] + xi
+    return dot(xi, w_new)
+```
+
+Check:
+
+```python
+linear_regression([453, 11, 86])
+```
+
+Output:
+
+```
+12.312
+```
+
+This matches the result from lesson 2.5.
+
+---
+
+## 5. Linear regression for all cars
+
+Now think about the whole dataset. Because of the fictional feature, every row of the feature matrix `X` starts with 1, followed by that car's features:
+
+```
+        bias  hp   mpg  popularity
+X = [ [  1,  x11, x12, x13 ],     <- car 1
+      [  1,  x21, x22, x23 ],     <- car 2
+      ...
+      [  1,  xm1, xm2, xm3 ] ]    <- car m
+```
+
+`X` has `m` rows (cars) and `n+1` columns (features plus the fictional one).
+
+To predict, take every row, dot it with `w`, and collect the results. That is a **matrix-vector multiplication**:
+
+$$
+Xw \approx y
+$$
+
+Plain text:
+
+```
+X . w  ≈  y
+```
+
+### Diagram: what the multiplication does
+
+```mermaid
+flowchart LR
+    X["X: m rows, n+1 columns"] --> MUL["X times w"]
+    W["w: n+1 weights"] --> MUL
+    MUL --> Y["y: m predictions, one per car"]
+```
+
+### Python: three cars
+
+```python
+import numpy as np
+
+x1  = [1, 148, 24, 1385]
+x2  = [1, 132, 25, 2031]
+x10 = [1, 453, 11, 86]
+
+X = [x1, x2, x10]
+X = np.array(X)
+X
+```
+
+Output:
+
+```
+array([[   1,  148,   24, 1385],
+       [   1,  132,   25, 2031],
+       [   1,  453,   11,   86]])
+```
+
+The weights are the same `w_new` as before:
+
+```python
+w0 = 7.17
+w = [0.01, 0.04, 0.002]
+w_new = [w0] + w
+```
+
+NumPy arrays have a `dot` method that does the whole multiplication in one line:
+
+```python
+def linear_regression(X):
+    return X.dot(w_new)
+
+linear_regression(X)
+```
+
+Output:
+
+```
+array([12.38 , 13.552, 12.312])
+```
+
+The third value is car number 10, the same 12.312 we got before. Each number is a **log price**, so convert to dollars with `np.expm1` when needed:
+
+```python
+np.expm1(linear_regression(X))
+```
+
+![X times w equals y](../02_regression/images/2.6-matrix-vector.png)
+
+---
+
+## 6. Shapes check
+
+A quick way to avoid bugs is to check shapes:
+
+```python
+X.shape       # (3, 4): 3 cars, 4 columns (1 bias column + 3 features)
+w_new         # 4 weights
+X.dot(w_new)  # 3 predictions
+```
+
+Rule: the number of **columns** in `X` must equal the number of **weights**. The result has one value per **row**.
+
+---
+
+## 7. Full code of the lesson
+
+```python
+import numpy as np
+
+w0 = 7.17
+w = [0.01, 0.04, 0.002]
+w_new = [w0] + w
+
+# One car, using the dot product by hand
+def dot(xi, w):
+    n = len(xi)
+    res = 0.0
+    for j in range(n):
+        res = res + xi[j] * w[j]
+    return res
+
+def linear_regression_one(xi):
+    xi = [1] + xi
+    return dot(xi, w_new)
+
+print(linear_regression_one([453, 11, 86]))   # 12.312
+
+# Many cars at once, using a matrix
+X = np.array([
+    [1, 148, 24, 1385],
+    [1, 132, 25, 2031],
+    [1, 453, 11, 86],
+])
+
+def linear_regression(X):
+    return X.dot(w_new)
+
+y_log = linear_regression(X)      # [12.38, 13.552, 12.312]
+y_price = np.expm1(y_log)         # prices in dollars
+print(y_log, y_price)
+```
+
+---
+
+## 8. Cheat sheet
+
+| Idea | Math | Code |
+|------|------|------|
+| One car, sum form | w0 + sum(xij * wj) | loop over features |
+| One car, dot product | w0 + dot(xi, w) | `w0 + dot(xi, w)` |
+| Fictional feature | xi0 = 1 | `[1] + xi` and `[w0] + w` |
+| All cars | X times w | `X.dot(w_new)` |
+| Back to dollars | inverse of log1p | `np.expm1(...)` |
+
+---
+
+## 9. Key takeaways
+
+- The sum over features in linear regression is a **dot product**.
+- Adding a **fictional feature equal to 1** lets the bias join the dot product, so the whole model is just `xi . w`.
+- For the full dataset, linear regression is a **matrix-vector multiplication**: `X . w` gives one prediction per row.
+- Vectorized NumPy code is shorter and much faster than Python loops.
+- The model still predicts **log price**, so use `np.expm1` to get dollars.
+- We still invented the weights. The next lesson shows how to compute them from data.
+
+---
+
+## 10. Navigation
+
+- Previous: 2.5 Linear regression (simple version)
+- Next: 2.7 Training a linear regression model
