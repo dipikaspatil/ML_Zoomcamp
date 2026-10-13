@@ -523,7 +523,7 @@ Plain text:
 z = w0 + xi1*w1 + xi2*w2 + ... + xin*wn
 ```
 
-![Sigmoid function](images/3.9-sigmoid.png)
+![Sigmoid function](../03_classification/images/3.9-sigmoid.png)
 
 How the sigmoid behaves:
 
