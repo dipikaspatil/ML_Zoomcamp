@@ -38,3 +38,4 @@ df_train, df_val = train_test_split(
 )
 ```
 
+Note: all questions and answers are part of homework.ipynb
